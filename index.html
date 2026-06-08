@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CotizaPro · INNOVVA Industrials</title>
+<style>
+  :root{
+    --bg:#0c0c0e; --panel:#15151a; --panel2:#1d1d23; --line:#2a2a32;
+    --txt:#f2f2f4; --muted:#8b8b96; --muted2:#5f5f6a;
+    --yellow:#ffd400; --yellow-d:#d9b400; --yellow-soft:#3a330a;
+    --green:#28c76f; --green-bg:#10301f;
+    --amber:#ffb020; --amber-bg:#3a2c0a;
+    --red:#ff5b5b; --red-bg:#3a1414;
+    --gray:#6b6b76; --gray-bg:#24242a;
+    --blue:#3aa0ff;
+    --radius:12px;
+    --shadow:0 6px 24px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+    font-size:14px; line-height:1.45; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--yellow)}
+  button{font-family:inherit}
+  input,select,textarea{font-family:inherit}
+
+  /* ===== layout ===== */
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; gap:18px;
+    padding:12px 20px; background:linear-gradient(180deg,#141417,#0e0e11);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:center; gap:11px; cursor:pointer; user-select:none}
+  .brand .mark{
+    width:34px;height:34px;border-radius:8px;
+    background:var(--yellow); color:#000; font-weight:900;
+    display:grid;place-items:center; font-size:18px; letter-spacing:-1px;
+    box-shadow:0 0 0 1px #00000040, 0 4px 12px rgba(255,212,0,.25);
+  }
+  .brand b{font-size:16px; letter-spacing:.5px}
+  .brand b span{color:var(--yellow)}
+  .brand small{display:block; color:var(--muted); font-size:10.5px; letter-spacing:2px; text-transform:uppercase; margin-top:-2px}
+  .topbar .spacer{flex:1}
+  .proj-pill{
+    display:flex; align-items:center; gap:10px; padding:7px 12px;
+    background:var(--panel2); border:1px solid var(--line); border-radius:30px;
+    font-size:13px; max-width:340px;
+  }
+  .proj-pill .code{color:var(--yellow); font-weight:700; font-variant-numeric:tabular-nums}
+  .proj-pill .nm{color:var(--txt); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .proj-pill select{
+    background:transparent;border:none;color:var(--txt);font-size:13px;outline:none;max-width:200px;
+  }
+  .proj-pill select option{background:var(--panel2)}
+
+  .shell{display:flex; min-height:calc(100vh - 59px)}
+  .side{
+    width:230px; flex-shrink:0; background:var(--panel); border-right:1px solid var(--line);
+    padding:14px 10px; position:sticky; top:59px; height:calc(100vh - 59px); overflow-y:auto;
+  }
+  .side .grp{margin:6px 6px 4px; color:var(--muted2); font-size:10.5px; letter-spacing:1.5px; text-transform:uppercase}
+  .navbtn{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    padding:9px 11px; margin:2px 0; border:none; background:transparent; color:var(--muted);
+    border-radius:9px; cursor:pointer; font-size:13.5px; transition:.12s;
+  }
+  .navbtn .ic{width:20px; text-align:center; font-size:15px}
+  .navbtn:hover{background:var(--panel2); color:var(--txt)}
+  .navbtn.active{background:var(--yellow-soft); color:var(--yellow); font-weight:600}
+  .navbtn .dot{margin-left:auto; width:8px;height:8px;border-radius:50%}
+  .main{flex:1; padding:24px 28px; max-width:1180px}
+
+  /* ===== generic ===== */
+  h1{font-size:21px; margin:0 0 3px}
+  h2{font-size:16px; margin:0 0 14px; letter-spacing:.3px}
+  .sub{color:var(--muted); font-size:13px; margin:0 0 22px}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; margin-bottom:18px}
+  .card h3{margin:0 0 14px; font-size:14px; letter-spacing:.4px; display:flex; align-items:center; gap:8px}
+  .row{display:flex; gap:14px; flex-wrap:wrap}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px}
+  .field label{display:block; color:var(--muted); font-size:11.5px; text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px}
+  .field{flex:1; min-width:150px; margin-bottom:12px}
+  input[type=text],input[type=number],input[type=date],select,textarea{
+    width:100%; padding:8px 10px; background:var(--bg); border:1px solid var(--line);
+    color:var(--txt); border-radius:8px; font-size:13.5px; outline:none; transition:.12s;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--yellow-d); box-shadow:0 0 0 3px rgba(255,212,0,.12)}
+  textarea{resize:vertical; min-height:60px}
+  input[type=number]{font-variant-numeric:tabular-nums}
+
+  .btn{
+    display:inline-flex; align-items:center; gap:7px; padding:9px 15px; border-radius:9px;
+    border:1px solid var(--line); background:var(--panel2); color:var(--txt); cursor:pointer;
+    font-size:13px; font-weight:600; transition:.12s;
+  }
+  .btn:hover{border-color:var(--muted)}
+  .btn.primary{background:var(--yellow); color:#000; border-color:var(--yellow)}
+  .btn.primary:hover{background:var(--yellow-d)}
+  .btn.ghost{background:transparent}
+  .btn.danger{color:var(--red); border-color:#4a1f1f}
+  .btn.danger:hover{background:var(--red-bg)}
+  .btn.sm{padding:6px 11px; font-size:12px}
+
+  /* ===== tables ===== */
+  .mod-table{width:100%; border-collapse:collapse; font-size:13px}
+  .mod-table th{
+    text-align:left; color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase;
+    letter-spacing:.5px; padding:8px 8px; border-bottom:1px solid var(--line); white-space:nowrap;
+  }
+  .mod-table td{padding:5px 8px; border-bottom:1px solid #1f1f25; vertical-align:middle}
+  .mod-table tr:last-child td{border-bottom:none}
+  .mod-table input,.mod-table select{padding:6px 8px; font-size:13px}
+  .mod-table .num{text-align:right; font-variant-numeric:tabular-nums}
+  .mod-table input.num{text-align:right}
+  .cell-total{font-weight:700; color:var(--yellow); text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+  .w-tot{width:120px}
+  .iconbtn{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:6px}
+  .iconbtn:hover{color:var(--red); background:var(--red-bg)}
+
+  /* status select */
+  .st{border-radius:20px!important; font-weight:600; font-size:11.5px!important; text-align:center; border:1px solid transparent!important; cursor:pointer; padding:5px 8px!important}
+  .st-confirmado{background:var(--green-bg)!important; color:var(--green)!important}
+  .st-estimado{background:var(--amber-bg)!important; color:var(--amber)!important}
+  .st-pendiente{background:var(--red-bg)!important; color:var(--red)!important}
+  .st-no_aplica{background:var(--gray-bg)!important; color:var(--gray)!important}
+
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600}
+  .badge.green{background:var(--green-bg);color:var(--green)}
+  .badge.amber{background:var(--amber-bg);color:var(--amber)}
+  .badge.red{background:var(--red-bg);color:var(--red)}
+  .badge.gray{background:var(--gray-bg);color:var(--gray)}
+  .badge.yellow{background:var(--yellow-soft);color:var(--yellow)}
+
+  .subtotbar{
+    display:flex; align-items:center; justify-content:space-between; margin-top:12px; padding-top:12px;
+    border-top:1px dashed var(--line);
+  }
+  .subtotbar .lbl{color:var(--muted); font-size:12.5px}
+  .subtotbar .val{font-size:17px; font-weight:800; color:var(--yellow); font-variant-numeric:tabular-nums}
+
+  /* period tabs */
+  .ptabs{display:flex; gap:8px; margin-bottom:18px}
+  .ptab{
+    padding:9px 18px; border-radius:30px; border:1px solid var(--line); background:var(--panel);
+    cursor:pointer; font-weight:600; font-size:13px; color:var(--muted); display:flex; align-items:center; gap:8px;
+  }
+  .ptab.active{background:var(--txt); color:#000; border-color:var(--txt)}
+  .ptab.emer.active{background:var(--amber); border-color:var(--amber); color:#000}
+  .ptab small{opacity:.7; font-weight:500}
+
+  .modtab-row{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px}
+  .modtab{padding:7px 12px; border-radius:8px; background:var(--panel); border:1px solid var(--line); cursor:pointer; font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:7px}
+  .modtab.active{background:var(--panel2); color:var(--txt); border-color:var(--muted2)}
+  .modtab .cnt{font-size:10px; background:var(--bg); padding:1px 6px; border-radius:10px; color:var(--muted)}
+  .modtab .mini{width:7px;height:7px;border-radius:50%}
+
+  /* dashboard cards */
+  .pcard{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px;
+    cursor:pointer; transition:.12s; position:relative; overflow:hidden;
+  }
+  .pcard:hover{border-color:var(--yellow-d); transform:translateY(-2px)}
+  .pcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--yellow)}
+  .pcard .code{color:var(--yellow); font-weight:700; font-size:12px; letter-spacing:1px}
+  .pcard .nm{font-size:16px; font-weight:700; margin:4px 0 2px}
+  .pcard .cl{color:var(--muted); font-size:12.5px; margin-bottom:12px}
+  .pcard .tot{font-size:20px; font-weight:800; color:var(--txt); font-variant-numeric:tabular-nums}
+  .pcard .tot small{font-size:11px; color:var(--muted); font-weight:500; display:block}
+  .pcard .foot{display:flex; align-items:center; justify-content:space-between; margin-top:12px}
+
+  /* KPI strip */
+  .kpis{display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:20px}
+  .kpi{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:13px 15px}
+  .kpi .k{color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.5px}
+  .kpi .v{font-size:18px; font-weight:800; margin-top:5px; font-variant-numeric:tabular-nums}
+  .kpi.hl{background:linear-gradient(135deg,#2a2407,#15150f); border-color:var(--yellow-d)}
+  .kpi.hl .v{color:var(--yellow)}
+
+  /* waterfall resumen */
+  .wf{width:100%; border-collapse:collapse}
+  .wf td{padding:11px 6px; border-bottom:1px solid #1f1f25; font-size:14px}
+  .wf td.r{text-align:right; font-variant-numeric:tabular-nums; font-weight:700}
+  .wf tr.sum td{border-top:2px solid var(--line); font-weight:800}
+  .wf tr.grand td{font-size:18px; color:var(--yellow); border-top:2px solid var(--yellow-d)}
+  .wf .pct{color:var(--muted); font-weight:500; font-size:12px}
+  .wf .plus{color:var(--green)}
+
+  .slider-wrap{display:flex; align-items:center; gap:14px}
+  input[type=range]{flex:1; accent-color:var(--yellow)}
+  .pctbox{width:84px; text-align:center}
+
+  /* reports */
+  .toggles{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px}
+  .tg{display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--panel); border:1px solid var(--line); border-radius:8px; font-size:12.5px; cursor:pointer}
+  .tg input{width:auto}
+  .report{background:#fff; color:#1a1a1a; border-radius:10px; padding:0; overflow:hidden; box-shadow:var(--shadow)}
+  .rep-pad{padding:38px 44px}
+  .empty{text-align:center; padding:60px 20px; color:var(--muted)}
+  .empty .big{font-size:46px; margin-bottom:10px}
+  .hint{font-size:12px; color:var(--muted2); margin-top:4px}
+  .note{background:var(--panel2); border-left:3px solid var(--yellow); padding:10px 14px; border-radius:6px; font-size:12.5px; color:var(--muted); margin:12px 0}
+  .flex-end{display:flex; justify-content:flex-end; gap:10px; margin-top:6px}
+  .seg{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden}
+  .seg button{padding:7px 13px; background:var(--panel); border:none; color:var(--muted); cursor:pointer; font-size:12.5px}
+  .seg button.on{background:var(--panel2); color:var(--yellow)}
+
+  /* ===== PRINT ===== */
+  #printArea{display:none}
+  @media print{
+    body{background:#fff}
+    .topbar,.side,.no-print{display:none!important}
+    .main{padding:0;max-width:none}
+    #printArea{display:block}
+    .app-body{display:none}
+    @page{margin:14mm}
+  }
+  /* report internals (used both on screen preview and print) */
+  .doc{color:#1a1a1a; font-size:12.5px; background:#fff}
+  .doc .head{display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #111; padding-bottom:16px; margin-bottom:18px}
+  .doc .logo{display:flex; align-items:center; gap:10px}
+  .doc .logo .m{width:40px;height:40px;background:#111;color:#ffd400;font-weight:900;display:grid;place-items:center;border-radius:8px;font-size:20px}
+  .doc .logo b{font-size:17px;letter-spacing:1px}
+  .doc .logo small{display:block;color:#666;font-size:9.5px;letter-spacing:2px}
+  .doc .meta{text-align:right; font-size:11.5px; color:#444}
+  .doc .meta .cot{font-size:15px;font-weight:800;color:#111}
+  .doc h2.dt{font-size:13px; background:#111; color:#fff; padding:7px 12px; border-radius:5px; margin:18px 0 10px; letter-spacing:.5px}
+  .doc table{width:100%; border-collapse:collapse; margin:6px 0}
+  .doc th{background:#f2f2f2; text-align:left; padding:8px 10px; font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; border-bottom:2px solid #ddd}
+  .doc td{padding:7px 10px; border-bottom:1px solid #eee; font-variant-numeric:tabular-nums}
+  .doc td.r,.doc th.r{text-align:right}
+  .doc .tot-row td{font-weight:800; background:#fafafa}
+  .doc .grand-row td{font-weight:900; font-size:14px; background:#111; color:#fff}
+  .doc .grand-row td .iva{font-weight:500;font-size:10px}
+  .doc .twocol{display:flex; gap:30px; margin-top:18px}
+  .doc .twocol > div{flex:1}
+  .doc .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:3px}
+  .doc .box{border:1px solid #ddd;border-radius:6px;padding:12px 14px;font-size:11.5px}
+  .doc .emer-box{border:2px dashed #d9a400;background:#fffbe8;padding:14px;border-radius:8px;margin-top:16px}
+  .doc .foot{margin-top:26px;border-top:1px solid #ddd;padding-top:12px;font-size:10px;color:#888;text-align:center}
+  .doc .st-tag{font-size:9px;padding:2px 6px;border-radius:10px;font-weight:700}
+  .doc .stc{background:#e3f9ec;color:#178a4e}
+  .doc .ste{background:#fff3da;color:#b97500}
+  .doc .stp{background:#ffe3e3;color:#cc2b2b}
+  .doc .stn{background:#eee;color:#888}
+  .doc .muted{color:#888}
+  .doc .pos{color:#178a4e}
+</style>
+</head>
+<body>
+
+<div class="topbar no-print">
+  <div class="brand" onclick="go('dashboard')">
+    <div class="mark">I</div>
+    <div>
+      <b>INN<span>O</span>VVA</b>
+      <small>CotizaPro</small>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="proj-pill" id="projPill"></div>
+  <button class="btn ghost sm" onclick="go('config')">⚙ Config</button>
+</div>
+
+<div class="app-body">
+<div class="shell">
+  <aside class="side no-print" id="sidebar"></aside>
+  <main class="main" id="view"></main>
+</div>
+</div>
+
+<div id="printArea"></div>
+
+<script>
+/* ============================================================
+   CotizaPro · INNOVVA Industrials
+   App de costeo de proyectos industriales — 100% offline
+   ============================================================ */
+
+const STORE = 'innovva_cotizapro_v1';
+const fmt = n => '$' + Math.round(n||0).toLocaleString('es-CL');
+const fmt0 = n => Math.round(n||0).toLocaleString('es-CL');
+const num = v => { const n = parseFloat(String(v).replace(/[^0-9.\-]/g,'')); return isNaN(n)?0:n; };
+const uid = () => 'x'+Math.random().toString(36).slice(2,9);
+const clone = o => JSON.parse(JSON.stringify(o));
+
+/* ---------- Config global (tarifas base) ---------- */
+const DEFAULT_CONFIG = {
+  tarifa_kevin_dia:42330, tarifa_kevin_sabado:52913,
+  tarifa_jerry_dia:52913, tarifa_jerry_sabado:66141,
+  tarifa_joel_dia:150000,
+  hotel_doble_noche:50000, hotel_simple_noche:37000,
+  almuerzo_persona_dia:8000, cena_persona_dia:8000,
+  costo_km:296, peaje_ida_vuelta:55000,
+  costo_fijo_mensual:777000,
+  contingencia_pct:10, utilidad_pct:25, iva_pct:19,
+  // textos informe
+  validez:'Cotización válida por 15 días corridos.',
+  forma_pago:'50% de anticipo contra orden de compra, 50% contra entrega del trabajo terminado.',
+  exclusiones:'No incluye: andamios o estructuras de acceso, grúas, suministro de energía eléctrica/aire en faena, trabajos no descritos en el alcance, materiales distintos a los listados, ni permisos especiales del mandante.',
+};
+
+/* ---------- Definición de módulos (esquema de tablas) ---------- */
+const MODULES = [
+  { key:'personal', title:'Personal', icon:'👷',
+    cols:[
+      {f:'nombre', l:'Trabajador', t:'text', w:130},
+      {f:'dias', l:'Días L-V', t:'num', w:80},
+      {f:'dias_sabado', l:'Sábados', t:'num', w:80},
+      {f:'tarifa_dia', l:'Costo empresa/día', t:'num', w:130},
+      {f:'tarifa_sabado', l:'Costo sábado', t:'num', w:120},
+    ],
+    calc:r => num(r.dias)*num(r.tarifa_dia) + num(r.dias_sabado)*num(r.tarifa_sabado),
+    nuevo:()=>({id:uid(),nombre:'Nuevo trabajador',dias:0,dias_sabado:0,tarifa_dia:0,tarifa_sabado:0,status:'pendiente',obs:''}) },
+
+  { key:'hotel', title:'Alojamiento', icon:'🏨',
+    cols:[
+      {f:'tipo', l:'Habitación', t:'sel', opts:['Doble','Simple','Triple'], w:120},
+      {f:'noches', l:'Noches', t:'num', w:90},
+      {f:'tarifa', l:'Valor/noche', t:'num', w:130},
+    ],
+    calc:r => num(r.noches)*num(r.tarifa),
+    nuevo:()=>({id:uid(),tipo:'Doble',noches:0,tarifa:0,status:'pendiente',obs:''}) },
+
+  { key:'alimentacion', title:'Alimentación', icon:'🍽️',
+    cols:[
+      {f:'concepto', l:'Concepto', t:'text', w:140},
+      {f:'personas', l:'Personas', t:'num', w:90},
+      {f:'dias', l:'Días', t:'num', w:80},
+      {f:'tarifa', l:'Valor/pers/día', t:'num', w:120},
+    ],
+    calc:r => num(r.personas)*num(r.dias)*num(r.tarifa),
+    nuevo:()=>({id:uid(),concepto:'Nuevo',personas:3,dias:0,tarifa:0,status:'pendiente',obs:''}) },
+
+  { key:'transporte', title:'Transporte y peajes', icon:'🚚',
+    cols:[
+      {f:'concepto', l:'Concepto', t:'text', w:160},
+      {f:'km', l:'Km', t:'num', w:90},
+      {f:'costo_km', l:'Costo/km', t:'num', w:100},
+      {f:'monto_fijo', l:'Monto fijo', t:'num', w:110},
+    ],
+    calc:r => num(r.km)*num(r.costo_km) + num(r.monto_fijo),
+    nuevo:()=>({id:uid(),concepto:'Nuevo',km:0,costo_km:296,monto_fijo:0,status:'pendiente',obs:''}) },
+
+  { key:'examenes', title:'Exámenes y documentación', icon:'📋',
+    cols:[
+      {f:'descripcion', l:'Descripción', t:'text', w:280},
+      {f:'monto', l:'Monto', t:'num', w:130},
+    ],
+    calc:r => num(r.monto),
+    nuevo:()=>({id:uid(),descripcion:'Nuevo',monto:0,status:'pendiente',obs:''}) },
+
+  { key:'costos_fijos', title:'Costos fijos Innovva', icon:'🏢',
+    cols:[
+      {f:'descripcion', l:'Descripción', t:'text', w:200},
+      {f:'costo_diario', l:'Costo/día', t:'num', w:110},
+      {f:'dias', l:'Días', t:'num', w:80},
+    ],
+    calc:r => num(r.costo_diario)*num(r.dias),
+    nuevo:()=>({id:uid(),descripcion:'Costos fijos',costo_diario:25900,dias:0,status:'confirmado',obs:''}) },
+
+  { key:'materiales', title:'Materiales y consumibles', icon:'🔩',
+    cols:[
+      {f:'descripcion', l:'Descripción', t:'text', w:200},
+      {f:'categoria', l:'Tipo', t:'sel', opts:['Material','Consumible'], w:120},
+      {f:'cantidad', l:'Cant.', t:'num', w:70},
+      {f:'unidad', l:'Un.', t:'text', w:60},
+      {f:'precio_unitario', l:'Precio unit.', t:'num', w:110},
+    ],
+    calc:r => num(r.cantidad)*num(r.precio_unitario),
+    nuevo:()=>({id:uid(),descripcion:'Nuevo ítem',categoria:'Material',cantidad:1,unidad:'un',precio_unitario:0,status:'pendiente',obs:''}) },
+
+  { key:'herramientas', title:'Herramientas (riesgo)', icon:'🛠️',
+    cols:[
+      {f:'descripcion', l:'Descripción', t:'text', w:300},
+      {f:'monto', l:'Monto imputado', t:'num', w:140},
+    ],
+    calc:r => num(r.monto),
+    nuevo:()=>({id:uid(),descripcion:'Bolsa de riesgo/desgaste',monto:0,status:'estimado',obs:''}) },
+];
+const MOD = Object.fromEntries(MODULES.map(m=>[m.key,m]));
+const CLIENT_GROUPS = [
+  {l:'Mano de obra y gestión técnica', mods:['personal']},
+  {l:'Logística y traslado', mods:['transporte']},
+  {l:'Estadía y alimentación', mods:['hotel','alimentacion']},
+  {l:'Materiales y consumibles', mods:['materiales','herramientas']},
+  {l:'Documentación y exámenes', mods:['examenes']},
+  {l:'Administración del proyecto', mods:['costos_fijos'], optional:'mostrar_costos_fijos'},
+];
+
+/* ---------- Periodo vacío ---------- */
+function emptyPeriod(){
+  const p={};
+  MODULES.forEach(m=>p[m.key]=[]);
+  return p;
+}
+
+/* ============================================================
+   SEED: Proyecto base Vallenar / Facoro (precios reales)
+   ============================================================ */
+function seedBaseProject(){
+  const base = emptyPeriod();
+  base.personal = [
+    {id:uid(),nombre:'Kevin',dias:10,dias_sabado:2,tarifa_dia:42330,tarifa_sabado:52913,status:'confirmado',obs:'Costo empresa: cesantía + SIS + mutual base'},
+    {id:uid(),nombre:'Jerry',dias:10,dias_sabado:2,tarifa_dia:52913,tarifa_sabado:66141,status:'confirmado',obs:'Costo empresa corregido'},
+    {id:uid(),nombre:'Joel (en terreno)',dias:14,dias_sabado:0,tarifa_dia:150000,tarifa_sabado:0,status:'confirmado',obs:'Costo trabajador, separado de la utilidad. 14 días de estadía.'},
+  ];
+  base.hotel = [
+    {id:uid(),tipo:'Doble',noches:14,tarifa:50000,status:'confirmado',obs:'Hotel Real Vallenar — incluye desayuno (Kevin+Jerry)'},
+    {id:uid(),tipo:'Simple',noches:14,tarifa:37000,status:'confirmado',obs:'Hotel Real Vallenar — incluye desayuno (Joel)'},
+  ];
+  base.alimentacion = [
+    {id:uid(),concepto:'Almuerzo',personas:3,dias:14,tarifa:8000,status:'confirmado',obs:''},
+    {id:uid(),concepto:'Cena',personas:3,dias:14,tarifa:8000,status:'confirmado',obs:''},
+    {id:uid(),concepto:'Colaciones viaje ida/vuelta',personas:1,dias:1,tarifa:150000,status:'confirmado',obs:'Desayuno incluido en hotel'},
+  ];
+  base.transporte = [
+    {id:uid(),concepto:'Camioneta Curacaví–Vallenar (1.356 km) + traslados a Facoro (288 km)',km:1644,costo_km:296,monto_fijo:0,status:'confirmado',obs:'Incluye permiso, seguro, depreciación, mantención, diésel y carga'},
+    {id:uid(),concepto:'Peajes tarifa punta ida/vuelta',km:0,costo_km:0,monto_fijo:55000,status:'confirmado',obs:''},
+  ];
+  base.examenes = [
+    {id:uid(),descripcion:'Exámenes y documentación laboral',monto:1000000,status:'confirmado',obs:'PENDIENTE confirmar si incluye contratos, inducciones, credenciales, carpeta de arranque y prevención de riesgos'},
+  ];
+  base.costos_fijos = [
+    {id:uid(),descripcion:'Costos fijos Innovva ($777.000/mes ÷ 30)',costo_diario:25900,dias:14,status:'confirmado',obs:'No duplica camioneta (ya incluida en costo/km)'},
+  ];
+  base.materiales = [
+    {id:uid(),descripcion:'Plancha fierro 1×3 m, e=4 mm',categoria:'Material',cantidad:1,unidad:'un',precio_unitario:180000,status:'estimado',obs:'Pendiente cotización real. Proveedores: Acenor Coquimbo, Prodalam, ferretería industrial'},
+    {id:uid(),descripcion:'Electrodo 6011 3/32',categoria:'Consumible',cantidad:1,unidad:'kg',precio_unitario:5990,status:'estimado',obs:''},
+    {id:uid(),descripcion:'Electrodo 6011 1/8',categoria:'Consumible',cantidad:1,unidad:'kg',precio_unitario:5990,status:'estimado',obs:''},
+    {id:uid(),descripcion:'Electrodo 7018 3/32',categoria:'Consumible',cantidad:1,unidad:'kg',precio_unitario:5990,status:'estimado',obs:'Se asumió que "8090" corresponde a 7018'},
+    {id:uid(),descripcion:'Electrodo 7018 1/8',categoria:'Consumible',cantidad:1,unidad:'kg',precio_unitario:5990,status:'estimado',obs:''},
+    {id:uid(),descripcion:'Disco corte metal 4.5" × 1 mm',categoria:'Consumible',cantidad:20,unidad:'un',precio_unitario:690,status:'estimado',obs:''},
+    {id:uid(),descripcion:'Disco corte metal 9"',categoria:'Consumible',cantidad:10,unidad:'un',precio_unitario:2990,status:'estimado',obs:''},
+    {id:uid(),descripcion:'Set brocas metal 10–19 mm',categoria:'Consumible',cantidad:1,unidad:'set',precio_unitario:120000,status:'estimado',obs:'Medidas 10,11,12,13,14,15,16,17,18,19 mm'},
+  ];
+  base.herramientas = [
+    {id:uid(),descripcion:'Bolsa de riesgo / desgaste de herramientas',monto:300000,status:'estimado',obs:'Expuesto: galletera 9" $190k, soldadora $300k, taladro $150k, llave impacto $200k = $840k. No se carga el 100%.'},
+  ];
+
+  // ---- Semana de emergencia ----
+  const emer = emptyPeriod();
+  emer.personal = [
+    {id:uid(),nombre:'Kevin',dias:5,dias_sabado:1,tarifa_dia:42330,tarifa_sabado:52913,status:'estimado',obs:''},
+    {id:uid(),nombre:'Jerry',dias:5,dias_sabado:1,tarifa_dia:52913,tarifa_sabado:66141,status:'estimado',obs:''},
+    {id:uid(),nombre:'Joel (en terreno)',dias:7,dias_sabado:0,tarifa_dia:150000,tarifa_sabado:0,status:'estimado',obs:'7 días de estadía'},
+  ];
+  emer.hotel = [
+    {id:uid(),tipo:'Doble',noches:7,tarifa:50000,status:'estimado',obs:''},
+    {id:uid(),tipo:'Simple',noches:7,tarifa:37000,status:'estimado',obs:''},
+  ];
+  emer.alimentacion = [
+    {id:uid(),concepto:'Almuerzo',personas:3,dias:7,tarifa:8000,status:'estimado',obs:''},
+    {id:uid(),concepto:'Cena',personas:3,dias:7,tarifa:8000,status:'estimado',obs:''},
+  ];
+  emer.transporte = [
+    {id:uid(),concepto:'Traslado hotel–Facoro (6 días × 24 km)',km:144,costo_km:296,monto_fijo:0,status:'estimado',obs:'Sin viaje largo: el equipo ya está en terreno'},
+  ];
+  emer.costos_fijos = [
+    {id:uid(),descripcion:'Costos fijos Innovva (7 días)',costo_diario:25900,dias:7,status:'estimado',obs:''},
+  ];
+
+  return {
+    id:uid(),
+    codigo:'COT-2026-001',
+    nombre:'Vallenar / Facoro',
+    cliente:'Facoro',
+    rut_cliente:'',
+    contacto:'',
+    descripcion_trabajo:'Servicio de montaje, soldadura y trabajos metalmecánicos en faena Facoro, Vallenar. Equipo de 3 personas por 2 semanas.',
+    ubicacion:'Vallenar, Región de Atacama',
+    lugar_trabajo:'Facoro',
+    km_desde_base:678,
+    fecha: today(),
+    estado:'en_cotizacion',
+    contingencia_pct:10,
+    utilidad_pct:25,
+    iva_pct:19,
+    notas_internas:'Hotel alternativo $65.000–$70.000/noche si Hotel Real no tiene disponibilidad. Semana de emergencia NO debe regalarse dentro del alcance base.',
+    emergencia_activa:true,
+    informe:{
+      mostrar_costos_fijos:false,
+      mostrar_materiales_detalle:true,
+      mostrar_emergencia:true,
+      mostrar_contingencia:true,
+    },
+    periodos:{ base, emergencia:emer }
+  };
+}
+
+function today(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+/* ============================================================
+   Persistencia
+   ============================================================ */
+let DB, UI={ view:'dashboard', period:'base', mod:'personal' };
+
+function load(){
+  try{
+    const raw = localStorage.getItem(STORE);
+    if(raw){ DB = JSON.parse(raw); }
+  }catch(e){ console.warn('load fail',e); }
+  if(!DB || !DB.projects || !DB.projects.length){
+    DB = { config:clone(DEFAULT_CONFIG), projects:[seedBaseProject()], activeId:null, counter:1 };
+    DB.activeId = DB.projects[0].id;
+  }
+  normalizeDB();
+  save();
+}
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(DB)); }catch(e){ alert('No se pudo guardar: '+e.message); } }
+/* Garantiza que todo proyecto (incluido un respaldo importado o de versión vieja)
+   tenga config completa, periodos.base/emergencia y todas las claves de módulo.
+   Evita crashes en duplicateProject/statusRollup/computeProject. */
+function normalizeDB(){
+  if(!DB) return;
+  DB.config = Object.assign(clone(DEFAULT_CONFIG), DB.config||{});
+  if(!Array.isArray(DB.projects)) DB.projects = [];
+  DB.projects.forEach(p=>{
+    if(!p.periodos || typeof p.periodos!=='object') p.periodos={};
+    ['base','emergencia'].forEach(pk=>{
+      if(!p.periodos[pk] || typeof p.periodos[pk]!=='object') p.periodos[pk]=emptyPeriod();
+      MODULES.forEach(m=>{ if(!Array.isArray(p.periodos[pk][m.key])) p.periodos[pk][m.key]=[]; });
+    });
+    if(!p.informe || typeof p.informe!=='object') p.informe={mostrar_costos_fijos:false,mostrar_materiales_detalle:true,mostrar_emergencia:true,mostrar_contingencia:true};
+  });
+  if(typeof DB.counter!=='number') DB.counter = DB.projects.length;
+  if(!DB.activeId || !DB.projects.some(p=>p.id===DB.activeId)) DB.activeId = DB.projects.length? DB.projects[0].id : null;
+}
+function active(){ return DB.projects.find(p=>p.id===DB.activeId) || DB.projects[0]; }
+function nextCodigo(){ DB.counter++; return 'COT-2026-'+String(DB.counter).padStart(3,'0'); }
+
+/* ============================================================
+   Motor de cálculo
+   ============================================================ */
+function rowTotal(modKey,row){
+  if(row.status==='no_aplica') return 0;
+  return MOD[modKey].calc(row);
+}
+function modSubtotal(period,modKey){
+  return (period[modKey]||[]).reduce((s,r)=>s+rowTotal(modKey,r),0);
+}
+function periodBreakdown(period){
+  const cats={};
+  let base=0;
+  MODULES.forEach(m=>{ cats[m.key]=modSubtotal(period,m.key); base+=cats[m.key]; });
+  return {cats, base};
+}
+function computeProject(proj){
+  const cont = num(proj.contingencia_pct), util = num(proj.utilidad_pct), iva = num(proj.iva_pct);
+  function full(period){
+    const {cats,base} = periodBreakdown(period);
+    const contMonto = base*cont/100;
+    const protegido = base+contMonto;
+    const utilMonto = protegido*util/100;
+    const neto = protegido+utilMonto;
+    const ivaMonto = neto*iva/100;
+    const total = neto+ivaMonto;
+    return {cats,base,contMonto,protegido,utilMonto,neto,ivaMonto,total};
+  }
+  const r = { base:full(proj.periodos.base) };
+  if(proj.emergencia_activa) r.emergencia = full(proj.periodos.emergencia);
+  return r;
+}
+function statusRollup(proj){
+  const counts={confirmado:0,estimado:0,pendiente:0,no_aplica:0};
+  const periods = proj.emergencia_activa ? ['base','emergencia'] : ['base'];
+  periods.forEach(pk=> MODULES.forEach(m=> (proj.periodos[pk][m.key]||[]).forEach(r=>{ counts[r.status]=(counts[r.status]||0)+1; })));
+  let worst='confirmado';
+  if(counts.estimado>0) worst='estimado';
+  if(counts.pendiente>0) worst='pendiente';
+  return {counts,worst};
+}
+const STATUS_COLOR = {confirmado:'green',estimado:'amber',pendiente:'red',no_aplica:'gray'};
+const STATUS_VAR   = {confirmado:'var(--green)',estimado:'var(--amber)',pendiente:'var(--red)',no_aplica:'var(--gray)'};
+
+/* ============================================================
+   Mutaciones
+   ============================================================ */
+function upd(field,value){ const p=active(); p[field]=value; save(); softTotals(); }
+function updNum(field,value){ const p=active(); p[field]=num(value); save(); render(); }
+function rowUpd(period,modKey,rowId,field,value,isNum){
+  const p=active(); const r=p.periodos[period][modKey].find(x=>x.id===rowId);
+  if(!r) return; r[field]= isNum? num(value) : value; save(); render();
+}
+function rowAdd(period,modKey){ const p=active(); p.periodos[period][modKey].push(MOD[modKey].nuevo()); save(); render(); }
+function rowDel(period,modKey,rowId){ const p=active(); p.periodos[period][modKey]=p.periodos[period][modKey].filter(x=>x.id!==rowId); save(); render(); }
+
+function newProject(){
+  const p = {
+    id:uid(), codigo:nextCodigo(), nombre:'Nuevo proyecto', cliente:'', rut_cliente:'', contacto:'',
+    descripcion_trabajo:'', ubicacion:'', lugar_trabajo:'', km_desde_base:0, fecha:today(), estado:'borrador',
+    contingencia_pct:DB.config.contingencia_pct, utilidad_pct:DB.config.utilidad_pct, iva_pct:DB.config.iva_pct,
+    notas_internas:'', emergencia_activa:false,
+    informe:{mostrar_costos_fijos:false,mostrar_materiales_detalle:true,mostrar_emergencia:true,mostrar_contingencia:true},
+    periodos:{ base:emptyPeriod(), emergencia:emptyPeriod() }
+  };
+  DB.projects.push(p); DB.activeId=p.id; save(); UI.view='general'; render();
+}
+function duplicateProject(id){
+  const src = DB.projects.find(p=>p.id===id); if(!src) return;
+  const copy = clone(src);
+  copy.id=uid(); copy.codigo=nextCodigo(); copy.nombre=src.nombre+' (copia)'; copy.estado='borrador'; copy.fecha=today();
+  // reset ids de filas y status a estimado/pendiente? mantenemos status pero nuevos ids
+  Object.keys(copy.periodos||{}).forEach(pk=> MODULES.forEach(m=> ((copy.periodos[pk]&&copy.periodos[pk][m.key])||[]).forEach(r=> r.id=uid())));
+  DB.projects.push(copy); DB.activeId=copy.id; save(); UI.view='general'; render();
+}
+function deleteProject(id){
+  if(DB.projects.length<=1){ alert('Debe existir al menos un proyecto.'); return; }
+  if(!confirm('¿Eliminar este proyecto? No se puede deshacer.')) return;
+  DB.projects = DB.projects.filter(p=>p.id!==id);
+  if(DB.activeId===id) DB.activeId=DB.projects[0].id;
+  save(); UI.view='dashboard'; render();
+}
+function switchProject(id){ DB.activeId=id; save(); render(); }
+function toggleEmergencia(v){ const p=active(); p.emergencia_activa=v; if(v && !p.periodos.emergencia) p.periodos.emergencia=emptyPeriod(); save(); render(); }
+
+/* ============================================================
+   Navegación
+   ============================================================ */
+function go(view){ UI.view=view; render(); }
+function setPeriod(pk){ UI.period=pk; render(); }
+function setMod(mk){ UI.mod=mk; render(); }
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(){
+  renderPill();
+  renderSidebar();
+  const v=UI.view;
+  const el=document.getElementById('view');
+  if(v==='dashboard') el.innerHTML=viewDashboard();
+  else if(v==='general') el.innerHTML=viewGeneral();
+  else if(v==='costos') el.innerHTML=viewCostos();
+  else if(v==='resumen') el.innerHTML=viewResumen();
+  else if(v==='emergencia') el.innerHTML=viewEmergencia();
+  else if(v==='informe_cliente') el.innerHTML=viewInformeCliente();
+  else if(v==='informe_interno') el.innerHTML=viewInformeInterno();
+  else if(v==='config') el.innerHTML=viewConfig();
+  else el.innerHTML=viewDashboard();
+  if(UI._last!==v){ window.scrollTo(0,0); UI._last=v; }
+}
+function softTotals(){ /* solo re-render ligero del resumen si visible */ if(['resumen','costos','dashboard'].includes(UI.view)) render(); }
+
+function renderPill(){
+  const p=active();
+  const opts = DB.projects.map(x=>`<option value="${x.id}" ${x.id===p.id?'selected':''}>${esc(x.codigo)} · ${esc(x.nombre)}</option>`).join('');
+  document.getElementById('projPill').innerHTML =
+    `<span class="code">${esc(p.codigo)}</span>
+     <select onchange="switchProject(this.value)">${opts}</select>`;
+}
+
+function renderSidebar(){
+  const r = statusRollup(active());
+  const dot = c => `<span class="dot" style="background:${STATUS_VAR[c]}"></span>`;
+  const item=(view,ic,label,extra='')=>`<button class="navbtn ${UI.view===view?'active':''}" onclick="go('${view}')"><span class="ic">${ic}</span><span>${label}</span>${extra}</button>`;
+  document.getElementById('sidebar').innerHTML = `
+    <div class="grp">Proyectos</div>
+    ${item('dashboard','▦','Todos los proyectos')}
+    <div class="grp" style="margin-top:14px">Proyecto activo</div>
+    ${item('general','📝','Datos generales')}
+    ${item('costos','📊','Costos — Base')}
+    ${item('emergencia','🚨','Semana emergencia', active().emergencia_activa?'<span class="dot" style="background:var(--amber)"></span>':'')}
+    ${item('resumen','💰','Resumen financiero', dot(r.worst))}
+    <div class="grp" style="margin-top:14px">Informes</div>
+    ${item('informe_cliente','📄','Informe cliente')}
+    ${item('informe_interno','🔍','Informe interno')}
+    <div class="grp" style="margin-top:14px">Sistema</div>
+    ${item('config','⚙','Configuración global')}
+    <div style="padding:14px 8px 4px">
+      <button class="btn primary" style="width:100%" onclick="newProject()">+ Nuevo proyecto</button>
+    </div>
+  `;
+}
+
+/* ---------- Dashboard ---------- */
+function viewDashboard(){
+  const cards = DB.projects.map(p=>{
+    const c=computeProject(p); const r=statusRollup(p);
+    const totalConEmer = c.base.total + (c.emergencia?c.emergencia.total:0);
+    return `<div class="pcard" onclick="switchProject('${p.id}');go('resumen')">
+      <div class="code">${esc(p.codigo)}</div>
+      <div class="nm">${esc(p.nombre)}</div>
+      <div class="cl">${esc(p.cliente||'— sin cliente —')} · ${esc(p.ubicacion||'')}</div>
+      <div class="tot">${fmt(c.base.total)}<small>Total base con IVA${c.emergencia?` · +${fmt(c.emergencia.total)} emergencia`:''}</small></div>
+      <div class="foot">
+        <span class="badge ${STATUS_COLOR[r.worst]}">${labelStatus(r.worst)}</span>
+        <div class="no-print">
+          <button class="iconbtn" title="Duplicar" onclick="event.stopPropagation();duplicateProject('${p.id}')">⧉</button>
+          <button class="iconbtn" title="Eliminar" onclick="event.stopPropagation();deleteProject('${p.id}')">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  return `
+    <h1>Proyectos</h1>
+    <p class="sub">${DB.projects.length} proyecto(s) · Empresa INNOVVA Industrials</p>
+    <div class="grid3">${cards}</div>
+    <div style="margin-top:20px"><button class="btn primary" onclick="newProject()">+ Crear nuevo proyecto</button></div>
+  `;
+}
+function labelStatus(s){ return {confirmado:'Confirmado',estimado:'Con estimados',pendiente:'Tiene pendientes',no_aplica:'—'}[s]; }
+
+/* ---------- Datos generales ---------- */
+function viewGeneral(){
+  const p=active();
+  const estados=['borrador','en_cotizacion','aprobado','ejecutado'];
+  return `
+    <h1>Datos generales</h1>
+    <p class="sub">${esc(p.codigo)} · Información del proyecto y del cliente</p>
+
+    <div class="card">
+      <h3>🏢 Proyecto</h3>
+      <div class="grid2">
+        <div class="field"><label>Nombre del proyecto</label><input type="text" value="${esc(p.nombre)}" onchange="upd('nombre',this.value)"></div>
+        <div class="field"><label>Código cotización</label><input type="text" value="${esc(p.codigo)}" onchange="upd('codigo',this.value)"></div>
+      </div>
+      <div class="field"><label>Descripción del trabajo (se muestra al cliente)</label><textarea onchange="upd('descripcion_trabajo',this.value)">${esc(p.descripcion_trabajo)}</textarea></div>
+      <div class="grid3">
+        <div class="field"><label>Ubicación / destino</label><input type="text" value="${esc(p.ubicacion)}" onchange="upd('ubicacion',this.value)"></div>
+        <div class="field"><label>Lugar de trabajo</label><input type="text" value="${esc(p.lugar_trabajo)}" onchange="upd('lugar_trabajo',this.value)"></div>
+        <div class="field"><label>Km desde base (Curacaví)</label><input type="number" value="${num(p.km_desde_base)}" onchange="updNum('km_desde_base',this.value)"></div>
+      </div>
+      <div class="grid3">
+        <div class="field"><label>Fecha</label><input type="date" value="${esc(p.fecha)}" onchange="upd('fecha',this.value)"></div>
+        <div class="field"><label>Estado del proyecto</label><select onchange="upd('estado',this.value)">${estados.map(e=>`<option value="${e}" ${p.estado===e?'selected':''}>${e.replace('_',' ')}</option>`).join('')}</select></div>
+        <div class="field"><label>Semana de emergencia</label><select onchange="toggleEmergencia(this.value==='si')"><option value="si" ${p.emergencia_activa?'selected':''}>Activada</option><option value="no" ${!p.emergencia_activa?'selected':''}>Desactivada</option></select></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>👤 Cliente</h3>
+      <div class="grid3">
+        <div class="field"><label>Razón social / cliente</label><input type="text" value="${esc(p.cliente)}" onchange="upd('cliente',this.value)"></div>
+        <div class="field"><label>RUT cliente</label><input type="text" value="${esc(p.rut_cliente)}" onchange="upd('rut_cliente',this.value)"></div>
+        <div class="field"><label>Contacto</label><input type="text" value="${esc(p.contacto)}" onchange="upd('contacto',this.value)"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🔒 Notas internas <span class="badge gray">no se muestran al cliente</span></h3>
+      <div class="field" style="margin:0"><textarea onchange="upd('notas_internas',this.value)">${esc(p.notas_internas)}</textarea></div>
+    </div>
+
+    <div class="flex-end no-print">
+      <button class="btn" onclick="duplicateProject('${p.id}')">⧉ Duplicar como plantilla</button>
+      <button class="btn primary" onclick="go('costos')">Continuar a costos →</button>
+    </div>
+  `;
+}
+
+/* ---------- Costos (período base) ---------- */
+function viewCostos(){
+  UI.period='base';
+  return costEditor('base','Costos — Período base');
+}
+function viewEmergencia(){
+  const p=active();
+  if(!p.emergencia_activa){
+    return `<h1>Semana de emergencia</h1>
+      <div class="empty"><div class="big">🚨</div>
+      <p>La semana de emergencia está <b>desactivada</b> para este proyecto.</p>
+      <p class="hint">Se cotiza como adicional separado — nunca incluida gratis en el alcance base.</p>
+      <button class="btn primary" onclick="toggleEmergencia(true)" style="margin-top:14px">Activar semana de emergencia</button></div>`;
+  }
+  UI.period='emergencia';
+  return costEditor('emergencia','Semana de emergencia (adicional separado)');
+}
+
+function costEditor(period,title){
+  const p=active();
+  const comp=computeProject(p);
+  const c = period==='base'?comp.base:comp.emergencia;
+  // module tabs
+  const tabs = MODULES.map(m=>{
+    const st = p.periodos[period][m.key];
+    const worst = st.some(r=>r.status==='pendiente')?'red':st.some(r=>r.status==='estimado')?'amber':st.length?'green':'gray';
+    return `<button class="modtab ${UI.mod===m.key?'active':''}" onclick="setMod('${m.key}')">
+      <span class="mini" style="background:${STATUS_VAR[worst==='red'?'pendiente':worst==='amber'?'estimado':worst==='green'?'confirmado':'no_aplica']}"></span>
+      ${m.icon} ${m.title}<span class="cnt">${st.length}</span></button>`;
+  }).join('');
+  const banner = period==='emergencia'
+    ? `<div class="note" style="border-left-color:var(--amber)">⚠ Esta semana se cotiza <b>aparte</b>. Su total NO se suma automáticamente al precio base — el cliente decide si la contrata.</div>`
+    : '';
+  return `
+    <h1>${title}</h1>
+    <p class="sub">${esc(p.codigo)} · ${esc(p.nombre)}</p>
+    ${period==='base'?periodHeader():''}
+    ${banner}
+    <div class="modtab-row">${tabs}</div>
+    ${moduleTable(period, UI.mod)}
+    <div class="card" style="background:var(--panel2)">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <div style="color:var(--muted);font-size:12px">Costo directo ${period==='base'?'base':'emergencia'} (suma de todos los módulos)</div>
+          <div style="font-size:24px;font-weight:800;color:var(--yellow)">${fmt(c.base)}</div>
+        </div>
+        <button class="btn primary" onclick="go('resumen')">Ver resumen financiero →</button>
+      </div>
+    </div>
+  `;
+}
+function periodHeader(){
+  return `<div class="note">Período base: <b>2 semanas · 14 días de estadía · 10 días hábiles · 2 sábados</b>. Edita los días directamente en cada módulo (columnas Días / Sábados).</div>`;
+}
+
+function moduleTable(period,modKey){
+  const m=MOD[modKey]; const p=active();
+  const rows=p.periodos[period][modKey]||[];
+  const head = m.cols.map(c=>`<th style="width:${c.w}px">${c.l}</th>`).join('')
+    + `<th class="num w-tot">Total</th><th style="width:120px">Estado</th><th style="width:200px">Observación</th><th></th>`;
+  let sub=0;
+  const body = rows.map(r=>{
+    const tot=rowTotal(modKey,r); sub+=tot;
+    const cells = m.cols.map(c=>{
+      if(c.t==='sel'){
+        return `<td><select onchange="rowUpd('${period}','${modKey}','${r.id}','${c.f}',this.value)">${c.opts.map(o=>`<option ${r[c.f]===o?'selected':''}>${o}</option>`).join('')}</select></td>`;
+      }
+      if(c.t==='num'){
+        return `<td><input class="num" type="number" step="any" value="${num(r[c.f])}" onchange="rowUpd('${period}','${modKey}','${r.id}','${c.f}',this.value,true)"></td>`;
+      }
+      return `<td><input type="text" value="${esc(r[c.f]||'')}" onchange="rowUpd('${period}','${modKey}','${r.id}','${c.f}',this.value)"></td>`;
+    }).join('');
+    const stSel = `<select class="st st-${r.status}" onchange="rowUpd('${period}','${modKey}','${r.id}','status',this.value)">
+        ${['confirmado','estimado','pendiente','no_aplica'].map(s=>`<option value="${s}" ${r.status===s?'selected':''}>${s.replace('_',' ')}</option>`).join('')}</select>`;
+    return `<tr>${cells}
+      <td class="cell-total">${r.status==='no_aplica'?'<span style="color:var(--gray)">—</span>':fmt(tot)}</td>
+      <td>${stSel}</td>
+      <td><input type="text" value="${esc(r.obs||'')}" onchange="rowUpd('${period}','${modKey}','${r.id}','obs',this.value)" placeholder="—"></td>
+      <td><button class="iconbtn" onclick="rowDel('${period}','${modKey}','${r.id}')">🗑</button></td></tr>`;
+  }).join('');
+
+  const extra = modKey==='herramientas' ? `<div class="note">Representa el <b>riesgo de desgaste/reposición</b>, no el valor total de las herramientas.</div>`
+    : modKey==='costos_fijos' ? `<div class="note">Costo fijo diario = costos mensuales Innovva ÷ 30. Se edita el total mensual en <a onclick="go('config')" style="cursor:pointer">Configuración global</a>.</div>`
+    : '';
+
+  return `<div class="card">
+    <h3>${m.icon} ${m.title}</h3>
+    ${extra}
+    <div style="overflow-x:auto"><table class="mod-table">
+      <thead><tr>${head}</tr></thead>
+      <tbody>${body || `<tr><td colspan="${m.cols.length+4}" style="text-align:center;color:var(--muted);padding:18px">Sin ítems. Agrega el primero ↓</td></tr>`}</tbody>
+    </table></div>
+    <div class="subtotbar">
+      <button class="btn sm" onclick="rowAdd('${period}','${modKey}')">+ Agregar línea</button>
+      <div><span class="lbl">Subtotal ${m.title}: </span><span class="val">${fmt(sub)}</span></div>
+    </div>
+  </div>`;
+}
+
+/* ---------- Resumen financiero ---------- */
+function viewResumen(){
+  const p=active(); const c=computeProject(p);
+  const r=statusRollup(p);
+  const wf=(d,titulo,emer)=>`
+    <div class="card">
+      <h3>${emer?'🚨 ':'📊 '}${titulo}</h3>
+      <table class="wf">
+        ${MODULES.map(m=>`<tr><td>${m.icon} ${m.title}</td><td class="r">${fmt(d.cats[m.key])}</td></tr>`).join('')}
+        <tr class="sum"><td>Costo directo</td><td class="r">${fmt(d.base)}</td></tr>
+        <tr><td class="plus">+ Contingencia <span class="pct">${num(p.contingencia_pct)}%</span></td><td class="r plus">${fmt(d.contMonto)}</td></tr>
+        <tr class="sum"><td>Costo protegido</td><td class="r">${fmt(d.protegido)}</td></tr>
+        <tr><td class="plus">+ Utilidad Innovva <span class="pct">${num(p.utilidad_pct)}%</span></td><td class="r plus">${fmt(d.utilMonto)}</td></tr>
+        <tr class="sum"><td>Valor neto (sin IVA)</td><td class="r">${fmt(d.neto)}</td></tr>
+        <tr><td>+ IVA <span class="pct">${num(p.iva_pct)}%</span></td><td class="r">${fmt(d.ivaMonto)}</td></tr>
+        <tr class="grand"><td>TOTAL CON IVA</td><td class="r">${fmt(d.total)}</td></tr>
+      </table>
+    </div>`;
+
+  const totalCompleto = c.base.total + (c.emergencia?c.emergencia.total:0);
+  return `
+    <h1>Resumen financiero</h1>
+    <p class="sub">${esc(p.codigo)} · ${esc(p.nombre)}</p>
+
+    <div class="kpis">
+      <div class="kpi"><div class="k">Costo directo base</div><div class="v">${fmt(c.base.base)}</div></div>
+      <div class="kpi"><div class="k">Utilidad ($)</div><div class="v" style="color:var(--green)">${fmt(c.base.utilMonto)}</div></div>
+      <div class="kpi"><div class="k">Neto sin IVA</div><div class="v">${fmt(c.base.neto)}</div></div>
+      <div class="kpi hl"><div class="k">Total base c/IVA</div><div class="v">${fmt(c.base.total)}</div></div>
+      <div class="kpi"><div class="k">Estado datos</div><div class="v"><span class="badge ${STATUS_COLOR[r.worst]}" style="font-size:12px">${labelStatus(r.worst)}</span></div></div>
+    </div>
+
+    <div class="card">
+      <h3>🎚️ Ajustes del proyecto</h3>
+      <div class="grid3">
+        <div class="field"><label>Contingencia (%)</label>
+          <div class="slider-wrap"><input type="range" min="0" max="30" step="1" value="${num(p.contingencia_pct)}" onchange="updNum('contingencia_pct',this.value)"><input class="pctbox" type="number" value="${num(p.contingencia_pct)}" onchange="updNum('contingencia_pct',this.value)"></div>
+          <div class="hint">5% baja · 10% recomendada · 15% conservadora</div>
+        </div>
+        <div class="field"><label>Utilidad (%)</label>
+          <div class="slider-wrap"><input type="range" min="0" max="50" step="1" value="${num(p.utilidad_pct)}" onchange="updNum('utilidad_pct',this.value)"><input class="pctbox" type="number" value="${num(p.utilidad_pct)}" onchange="updNum('utilidad_pct',this.value)"></div>
+          <div class="hint">20% competitivo · 25% recomendado · 30% seguro</div>
+        </div>
+        <div class="field"><label>IVA (%)</label>
+          <div class="slider-wrap"><input class="pctbox" type="number" value="${num(p.iva_pct)}" onchange="updNum('iva_pct',this.value)"></div>
+          <div class="hint">Estándar Chile: 19%</div>
+        </div>
+      </div>
+    </div>
+
+    ${wf(c.base,'Período base (2 semanas)',false)}
+    ${c.emergencia?wf(c.emergencia,'Semana de emergencia (adicional)',true):''}
+
+    ${c.emergencia?`<div class="card" style="background:linear-gradient(135deg,#2a2407,#15150f);border-color:var(--yellow-d)">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div><div style="color:var(--muted);font-size:12px">Total proyecto completo (base + emergencia, si el cliente la contrata)</div>
+        <div style="font-size:26px;font-weight:800;color:var(--yellow)">${fmt(totalCompleto)}</div></div>
+      </div></div>`:''}
+
+    <div class="flex-end no-print">
+      <button class="btn" onclick="go('informe_interno')">🔍 Informe interno</button>
+      <button class="btn primary" onclick="go('informe_cliente')">📄 Informe cliente</button>
+    </div>
+  `;
+}
+
+/* ============================================================
+   INFORMES
+   ============================================================ */
+function viewInformeCliente(){
+  const p=active();
+  const inf=p.informe;
+  return `
+    <h1>Informe cliente</h1>
+    <p class="sub">Vista comercial — sin costos internos ni márgenes</p>
+    <div class="toggles no-print">
+      ${tg('mostrar_costos_fijos','Mostrar "Administración" como línea')}
+      ${tg('mostrar_materiales_detalle','Detallar materiales ítem por ítem')}
+      ${tg('mostrar_contingencia','Mostrar contingencia como línea')}
+      ${p.emergencia_activa?tg('mostrar_emergencia','Incluir semana de emergencia'):''}
+    </div>
+    <div class="flex-end no-print" style="margin-bottom:14px">
+      <button class="btn primary" onclick="printDoc('cliente')">🖨 Exportar a PDF</button>
+    </div>
+    <div class="report rep-pad">${clienteDocHTML(p)}</div>
+  `;
+}
+function tg(key,label){ const p=active(); return `<label class="tg"><input type="checkbox" ${p.informe[key]?'checked':''} onchange="toggleInforme('${key}',this.checked)"> ${label}</label>`; }
+function toggleInforme(key,val){ active().informe[key]=val; save(); render(); }
+
+function clienteDocHTML(p){
+  const c=computeProject(p);
+  const util=num(p.utilidad_pct), cont=num(p.contingencia_pct), iva=num(p.iva_pct);
+  const fUtil = 1+util/100;
+  // group display = costo * (1+util) ; contingencia line = base*cont%*(1+util)
+  function groupsFor(period){
+    const {cats,base}=periodBreakdown(period);
+    let rows=[]; let foldFijos=0;
+    CLIENT_GROUPS.forEach(g=>{
+      let cost=g.mods.reduce((s,mk)=>s+cats[mk],0);
+      if(g.optional && !p.informe[g.optional]){ foldFijos+=cost; return; }
+      if(cost<=0) return;
+      rows.push({l:g.l, val:cost*fUtil});
+    });
+    if(foldFijos>0){
+      if(rows.length) rows[0].val += foldFijos*fUtil;
+      else rows.push({l:'Administración del proyecto', val:foldFijos*fUtil});
+    }
+    let contLine=null;
+    if(p.informe.mostrar_contingencia){
+      contLine = base*(cont/100)*fUtil;
+    }else{
+      // distribuir contingencia proporcional en los grupos
+      const factor = base>0 ? (base*(cont/100)*fUtil)/(rows.reduce((s,r)=>s+r.val,0)||1) : 0;
+      rows.forEach(r=>r.val*=(1+factor));
+    }
+    const neto = rows.reduce((s,r)=>s+r.val,0)+(contLine||0);
+    return {rows,contLine,neto};
+  }
+  const g=groupsFor(p.periodos.base);
+  const ivaMonto=g.neto*iva/100, total=g.neto+ivaMonto;
+
+  const matDetalle = p.informe.mostrar_materiales_detalle ? materialesClienteTable(p.periodos.base) : '';
+
+  let emerBlock='';
+  if(p.emergencia_activa && p.informe.mostrar_emergencia && c.emergencia){
+    const ge=groupsFor(p.periodos.emergencia);
+    const eIva=ge.neto*iva/100, eTot=ge.neto+eIva;
+    emerBlock=`<div class="emer-box">
+      <div style="font-weight:800;font-size:13px;margin-bottom:8px">⚠ Semana de emergencia — valor adicional opcional</div>
+      <table>${ge.rows.map(r=>`<tr><td>${r.l}</td><td class="r">${fmt(r.val)}</td></tr>`).join('')}
+      ${ge.contLine?`<tr><td>Contingencia operativa</td><td class="r">${fmt(ge.contLine)}</td></tr>`:''}
+      <tr class="tot-row"><td>Neto adicional</td><td class="r">${fmt(ge.neto)}</td></tr>
+      <tr><td>IVA ${iva}%</td><td class="r">${fmt(eIva)}</td></tr>
+      <tr class="tot-row"><td>Total semana emergencia c/IVA</td><td class="r">${fmt(eTot)}</td></tr></table>
+      <div class="muted" style="margin-top:6px;font-size:10.5px">Se cotiza por separado. Solo se factura si el cliente la requiere.</div>
+    </div>`;
+  }
+
+  return `<div class="doc">
+    <div class="head">
+      <div class="logo"><div class="m">I</div><div><b>INNOVVA</b><small>INDUSTRIALS</small></div></div>
+      <div class="meta">
+        <div class="cot">${esc(p.codigo)}</div>
+        <div>Fecha: ${esc(p.fecha)}</div>
+        <div>${esc(p.ubicacion)}</div>
+      </div>
+    </div>
+
+    <div class="twocol" style="margin-top:0">
+      <div><div class="lbl">Cliente</div><div class="box"><b>${esc(p.cliente||'—')}</b>${p.rut_cliente?`<br>RUT: ${esc(p.rut_cliente)}`:''}${p.contacto?`<br>Contacto: ${esc(p.contacto)}`:''}</div></div>
+      <div><div class="lbl">Proyecto</div><div class="box"><b>${esc(p.nombre)}</b><br>Lugar: ${esc(p.lugar_trabajo||p.ubicacion)}</div></div>
+    </div>
+
+    <h2 class="dt">ALCANCE DEL TRABAJO</h2>
+    <p style="margin:4px 2px 0">${esc(p.descripcion_trabajo||'—')}</p>
+
+    <h2 class="dt">DETALLE DE LA PROPUESTA</h2>
+    <table>
+      <thead><tr><th>Concepto</th><th class="r">Valor</th></tr></thead>
+      <tbody>
+        ${g.rows.map(r=>`<tr><td>${r.l}</td><td class="r">${fmt(r.val)}</td></tr>`).join('')}
+        ${g.contLine?`<tr><td>Contingencia operativa</td><td class="r">${fmt(g.contLine)}</td></tr>`:''}
+        <tr class="tot-row"><td>VALOR NETO</td><td class="r">${fmt(g.neto)}</td></tr>
+        <tr><td>IVA ${iva}%</td><td class="r">${fmt(ivaMonto)}</td></tr>
+        <tr class="grand-row"><td>TOTAL CON IVA</td><td class="r">${fmt(total)}</td></tr>
+      </tbody>
+    </table>
+    ${matDetalle}
+    ${emerBlock}
+
+    <div class="twocol">
+      <div><div class="lbl">Forma de pago</div><div class="box">${esc(DB.config.forma_pago)}</div></div>
+      <div><div class="lbl">Validez</div><div class="box">${esc(DB.config.validez)}</div></div>
+    </div>
+    <div style="margin-top:14px"><div class="lbl">Exclusiones</div><div class="box">${esc(DB.config.exclusiones)}</div></div>
+
+    <div class="foot">INNOVVA INDUSTRIALS · Servicios industriales y montaje · Cotización ${esc(p.codigo)} · Generada el ${esc(p.fecha)}</div>
+  </div>`;
+}
+function materialesClienteTable(period){
+  const rows=(period.materiales||[]).filter(r=>r.status!=='no_aplica');
+  if(!rows.length) return '';
+  return `<h2 class="dt">MATERIALES Y CONSUMIBLES CONSIDERADOS</h2>
+    <table><thead><tr><th>Descripción</th><th class="r">Cant.</th><th>Un.</th></tr></thead>
+    <tbody>${rows.map(r=>`<tr><td>${esc(r.descripcion)}</td><td class="r">${num(r.cantidad)}</td><td>${esc(r.unidad||'')}</td></tr>`).join('')}</tbody></table>
+    <div class="muted" style="font-size:10px;margin-top:3px">* Valores incluidos en el ítem "Materiales y consumibles".</div>`;
+}
+
+/* ---------- Informe interno ---------- */
+function viewInformeInterno(){
+  const p=active();
+  return `
+    <h1>Informe interno</h1>
+    <p class="sub">Vista completa — costos reales, márgenes y estados. SOLO uso interno Innovva.</p>
+    <div class="flex-end no-print" style="margin-bottom:14px">
+      <button class="btn primary" onclick="printDoc('interno')">🖨 Exportar a PDF</button>
+    </div>
+    <div class="report rep-pad">${internoDocHTML(p)}</div>
+  `;
+}
+function stTag(s){ const m={confirmado:['stc','Confirmado'],estimado:['ste','Estimado'],pendiente:['stp','Pendiente'],no_aplica:['stn','No aplica']}; const x=m[s]; return `<span class="st-tag ${x[0]}">${x[1]}</span>`; }
+
+function internoDocHTML(p){
+  const c=computeProject(p); const r=statusRollup(p);
+  function periodDetail(period,d,titulo,emer){
+    const blocks = MODULES.map(m=>{
+      const rows=p.periodos[period][m.key]||[];
+      if(!rows.length) return '';
+      const body=rows.map(row=>{
+        const t=rowTotal(m.key,row);
+        const desc = row.nombre||row.concepto||row.descripcion||row.tipo||'';
+        const det = m.cols.filter(c=>c.t==='num').map(c=>`${c.l}: ${fmt0(num(row[c.f]))}`).join(' · ');
+        return `<tr><td><b>${esc(desc)}</b>${row.obs?`<br><span class="muted" style="font-size:10px">${esc(row.obs)}</span>`:''}</td>
+          <td class="muted" style="font-size:10px">${det}</td>
+          <td>${stTag(row.status)}</td>
+          <td class="r">${row.status==='no_aplica'?'—':fmt(t)}</td></tr>`;
+      }).join('');
+      return `<tr class="tot-row"><td colspan="3">${m.icon} ${m.title}</td><td class="r">${fmt(d.cats[m.key])}</td></tr>${body}`;
+    }).join('');
+    return `<h2 class="dt">${emer?'🚨 ':''}${titulo}</h2>
+      <table><thead><tr><th>Ítem</th><th>Detalle</th><th>Estado</th><th class="r">Total</th></tr></thead>
+      <tbody>${blocks}</tbody></table>
+      <table style="margin-top:10px">
+        <tr class="tot-row"><td>Costo directo</td><td class="r">${fmt(d.base)}</td></tr>
+        <tr><td class="pos">+ Contingencia ${num(p.contingencia_pct)}%</td><td class="r pos">${fmt(d.contMonto)}</td></tr>
+        <tr class="tot-row"><td>Costo protegido</td><td class="r">${fmt(d.protegido)}</td></tr>
+        <tr><td class="pos">+ Utilidad ${num(p.utilidad_pct)}% (margen Innovva)</td><td class="r pos">${fmt(d.utilMonto)}</td></tr>
+        <tr class="tot-row"><td>Neto sin IVA</td><td class="r">${fmt(d.neto)}</td></tr>
+        <tr><td>+ IVA ${num(p.iva_pct)}%</td><td class="r">${fmt(d.ivaMonto)}</td></tr>
+        <tr class="grand-row"><td>TOTAL CON IVA</td><td class="r">${fmt(d.total)}</td></tr>
+      </table>`;
+  }
+  return `<div class="doc">
+    <div class="head">
+      <div class="logo"><div class="m">I</div><div><b>INNOVVA</b><small>INFORME INTERNO</small></div></div>
+      <div class="meta"><div class="cot">${esc(p.codigo)}</div><div>${esc(p.nombre)}</div><div>${esc(p.fecha)}</div></div>
+    </div>
+    <div class="box" style="background:#fff8e1;border-color:#e0c060;margin-bottom:14px">
+      <b>⚠ Documento interno.</b> Contiene costos reales, márgenes y sueldos. No entregar al cliente.
+    </div>
+    <div class="twocol" style="margin-top:0">
+      <div><div class="lbl">Cliente</div><div class="box">${esc(p.cliente||'—')} ${p.rut_cliente?'· '+esc(p.rut_cliente):''}</div></div>
+      <div><div class="lbl">Estado de datos</div><div class="box">
+        ${stTag('confirmado')} ${r.counts.confirmado} &nbsp; ${stTag('estimado')} ${r.counts.estimado} &nbsp; ${stTag('pendiente')} ${r.counts.pendiente} &nbsp; ${stTag('no_aplica')} ${r.counts.no_aplica}
+      </div></div>
+    </div>
+    ${periodDetail('base',c.base,'PERÍODO BASE (2 semanas)',false)}
+    ${c.emergencia?periodDetail('emergencia',c.emergencia,'SEMANA DE EMERGENCIA (adicional)',true):''}
+    ${p.notas_internas?`<h2 class="dt">NOTAS INTERNAS</h2><div class="box">${esc(p.notas_internas)}</div>`:''}
+    <div class="foot">INNOVVA INDUSTRIALS · Informe interno ${esc(p.codigo)} · ${esc(p.fecha)} · Documento confidencial</div>
+  </div>`;
+}
+
+/* ---------- Configuración global ---------- */
+function viewConfig(){
+  const cf=DB.config;
+  const f=(key,label,hint='')=>`<div class="field"><label>${label}</label><input type="number" value="${num(cf[key])}" onchange="cfgUpd('${key}',num(this.value))">${hint?`<div class="hint">${hint}</div>`:''}</div>`;
+  return `
+    <h1>Configuración global</h1>
+    <p class="sub">Tarifas y textos por defecto. <b>No afecta proyectos ya creados</b>, solo los nuevos.</p>
+
+    <div class="card"><h3>👷 Tarifas personal (costo empresa)</h3>
+      <div class="grid2">
+        ${f('tarifa_kevin_dia','Kevin — día (L-V)')}${f('tarifa_kevin_sabado','Kevin — sábado')}
+        ${f('tarifa_jerry_dia','Jerry — día (L-V)')}${f('tarifa_jerry_sabado','Jerry — sábado')}
+        ${f('tarifa_joel_dia','Joel — día en terreno','Costo trabajador, separado de la utilidad')}
+      </div>
+    </div>
+
+    <div class="card"><h3>🏨 Estadía y alimentación</h3>
+      <div class="grid3">
+        ${f('hotel_doble_noche','Hotel doble / noche')}${f('hotel_simple_noche','Hotel simple / noche')}
+        ${f('almuerzo_persona_dia','Almuerzo / persona')}${f('cena_persona_dia','Cena / persona')}
+      </div>
+    </div>
+
+    <div class="card"><h3>🚚 Transporte y fijos</h3>
+      <div class="grid3">
+        ${f('costo_km','Costo por km','Incluye permiso, seguro, depreciación, mantención, diésel')}
+        ${f('peaje_ida_vuelta','Peajes ida/vuelta')}
+        ${f('costo_fijo_mensual','Costos fijos Innovva / mes',`Diario: ${fmt(num(cf.costo_fijo_mensual)/30)}`)}
+      </div>
+    </div>
+
+    <div class="card"><h3>📈 Porcentajes por defecto</h3>
+      <div class="grid3">
+        ${f('contingencia_pct','Contingencia % (default)')}
+        ${f('utilidad_pct','Utilidad % (default)')}
+        ${f('iva_pct','IVA %')}
+      </div>
+    </div>
+
+    <div class="card"><h3>📄 Textos del informe cliente</h3>
+      <div class="field"><label>Forma de pago</label><textarea onchange="cfgUpd('forma_pago',this.value)">${esc(cf.forma_pago)}</textarea></div>
+      <div class="field"><label>Validez de la oferta</label><textarea onchange="cfgUpd('validez',this.value)">${esc(cf.validez)}</textarea></div>
+      <div class="field"><label>Exclusiones</label><textarea onchange="cfgUpd('exclusiones',this.value)">${esc(cf.exclusiones)}</textarea></div>
+    </div>
+
+    <div class="card" style="border-color:#4a1f1f">
+      <h3>⚠ Datos</h3>
+      <div class="row">
+        <button class="btn" onclick="exportJSON()">⬇ Respaldar todo (JSON)</button>
+        <button class="btn" onclick="document.getElementById('imp').click()">⬆ Restaurar respaldo</button>
+        <input id="imp" type="file" accept=".json" style="display:none" onchange="importJSON(this.files[0])">
+        <button class="btn danger" onclick="resetAll()">Borrar todo y recargar datos base</button>
+      </div>
+    </div>
+  `;
+}
+function cfgUpd(key,val){ DB.config[key]=val; save(); if(UI.view==='config') render(); }
+
+/* ---------- Export / Import / Reset ---------- */
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='cotizapro_respaldo_'+today()+'.json'; a.click();
+}
+function importJSON(file){
+  if(!file) return; const rd=new FileReader();
+  rd.onload=e=>{ try{
+    const d=JSON.parse(e.target.result);
+    if(!d || !Array.isArray(d.projects) || !d.projects.length) throw new Error('estructura inválida (falta projects)');
+    DB=d; normalizeDB(); save(); UI.view='dashboard'; UI._last=null; render(); alert('Respaldo restaurado.');
+  }catch(err){ alert('Archivo inválido: '+err.message); } };
+  rd.readAsText(file);
+}
+function resetAll(){ if(!confirm('Esto borra TODOS los proyectos y recarga los datos base. ¿Continuar?')) return; localStorage.removeItem(STORE); DB=null; load(); UI.view='dashboard'; render(); }
+
+/* ---------- PDF print ---------- */
+function printDoc(tipo){
+  const p=active();
+  document.getElementById('printArea').innerHTML = tipo==='cliente'? clienteDocHTML(p) : internoDocHTML(p);
+  window.print();
+}
+
+/* ---------- util ---------- */
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ---------- boot ---------- */
+load(); render();
+</script>
+</body>
+</html>
