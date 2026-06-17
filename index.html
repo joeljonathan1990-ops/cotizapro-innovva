@@ -393,9 +393,9 @@ const clone = o => JSON.parse(JSON.stringify(o));
 
 /* ---------- Config global (tarifas base) ---------- */
 const DEFAULT_CONFIG = {
-  tarifa_kevin_dia:45000, tarifa_kevin_sabado:56000,
-  tarifa_jerry_dia:45000, tarifa_jerry_sabado:56000,
-  tarifa_joel_dia:80000,
+  tarifa_t1_dia:45000, tarifa_t1_sab:56000,
+  tarifa_t2_dia:45000, tarifa_t2_sab:56000,
+  tarifa_sup_dia:80000,
   hotel_doble_noche:50000, hotel_simple_noche:37000,
   almuerzo_persona_dia:8000, cena_persona_dia:8000,
   costo_km:300, peaje_ida_vuelta:50000,
@@ -1623,9 +1623,9 @@ function viewConfig(){
 
     <div class="card"><h3>👷 Tarifas personal (costo empresa)</h3>
       <div class="grid2">
-        ${f('tarifa_kevin_dia','Trabajador 1 — día (L-V)')}${f('tarifa_kevin_sabado','Trabajador 1 — sábado')}
-        ${f('tarifa_jerry_dia','Trabajador 2 — día (L-V)')}${f('tarifa_jerry_sabado','Trabajador 2 — sábado')}
-        ${f('tarifa_joel_dia','Supervisor — día en terreno','Costo trabajador, separado de la utilidad')}
+        ${f('tarifa_t1_dia','Trabajador 1 — día (L-V)')}${f('tarifa_t1_sab','Trabajador 1 — sábado')}
+        ${f('tarifa_t2_dia','Trabajador 2 — día (L-V)')}${f('tarifa_t2_sab','Trabajador 2 — sábado')}
+        ${f('tarifa_sup_dia','Supervisor — día en terreno','Costo trabajador, separado de la utilidad')}
       </div>
     </div>
 
