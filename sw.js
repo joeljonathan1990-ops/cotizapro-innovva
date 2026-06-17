@@ -1,7 +1,7 @@
 /* CotizaPro · service worker — permite instalar la app y usarla sin internet.
    Estrategia: red primero (siempre baja la última versión si hay internet),
    con respaldo al caché cuando no hay conexión. */
-const CACHE = 'cotizapro-v2-1';
+const CACHE = 'cotizapro-v2-2';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './icon-180.png'
