@@ -675,7 +675,7 @@ function load(){
   save();
 }
 function save(){ try{ localStorage.setItem(STORE, JSON.stringify(DB)); }catch(e){ alert('No se pudo guardar: '+e.message); } }
-const ID_RE = /^x[a-z0-9]{5,9}$/; // formato de uid(); ids ajenos se regeneran (evita inyección por respaldo)
+const STATUS_OK = ['confirmado','estimado','pendiente','no_aplica']; const ID_RE = /^x[a-z0-9]{5,9}$/; // formato de uid(); ids ajenos se regeneran y estados ajenos pasan a 'pendiente' (evita inyección por respaldo)
 
 /* Garantiza estructura completa en proyectos (incluye respaldos V1 importados):
    módulo contratistas, condiciones por proyecto y opciones del documento. */
@@ -692,7 +692,7 @@ function normalizeDB(){
       MODULES.forEach(m=>{
         if(!Array.isArray(p.periodos[pk][m.key])) p.periodos[pk][m.key]=[];
         p.periodos[pk][m.key] = p.periodos[pk][m.key].filter(r=>r && typeof r==='object');
-        p.periodos[pk][m.key].forEach(r=>{ if(!ID_RE.test(String(r.id||''))) r.id=uid(); });
+        p.periodos[pk][m.key].forEach(r=>{ if(!ID_RE.test(String(r.id||''))) r.id=uid(); if(r.status!=null && !STATUS_OK.includes(r.status)) r.status='pendiente'; });
       });
     });
     if(!p.informe || typeof p.informe!=='object') p.informe={mostrar_costos_fijos:false,mostrar_materiales_detalle:true,mostrar_emergencia:true,mostrar_contingencia:true};
@@ -1112,7 +1112,7 @@ function moduleTable(period,modKey){
   const body = rows.map((r,i)=>{
     const tot=rowTotal(modKey,r); sub+=tot;
     const cells = m.cols.map(c=>cellInput(period,modKey,r,c)).join('');
-    const stSel = `<select data-cell="${period}:${modKey}:${r.id}:status" class="st st-${r.status}" onchange="rowUpd('${period}','${modKey}','${r.id}','status',this.value)">
+    const stSel = `<select data-cell="${period}:${modKey}:${r.id}:status" class="st st-${esc(r.status)}" onchange="rowUpd('${period}','${modKey}','${r.id}','status',this.value)">
         ${['confirmado','estimado','pendiente','no_aplica'].map(s=>`<option value="${s}" ${r.status===s?'selected':''}>${s.replace('_',' ')}</option>`).join('')}</select>`;
     // índice de búsqueda: valores crudos + montos formateados (para buscar "1.500.000" tal como se ve)
     const fmtVals = m.cols.filter(c=>c.t==='money'||c.t==='num').map(c=>fmt0(num(r[c.f])));
